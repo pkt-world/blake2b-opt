@@ -24,6 +24,7 @@ LIB_PUBLIC void blake2b_final(blake2b_state *S, unsigned char *hash);
 /* one-shot */
 LIB_PUBLIC void blake2b(unsigned char *hash, const unsigned char *in, size_t inlen);
 LIB_PUBLIC void blake2b_keyed(unsigned char *hash, const unsigned char *in, size_t inlen, const unsigned char *key, size_t keylen);
+LIB_PUBLIC void blake2b_hashlen(unsigned char* hash, unsigned char hashlen, const unsigned char* in, size_t inlen);
 
 LIB_PUBLIC int blake2b_startup(void);
 

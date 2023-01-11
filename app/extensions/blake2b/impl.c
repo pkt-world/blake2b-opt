@@ -323,6 +323,34 @@ blake2b(unsigned char *hash, const unsigned char *in, size_t inlen) {
 }
 
 LIB_PUBLIC void
+blake2b_hashlen(unsigned char* hash, unsigned char hashlen, const unsigned char* in, size_t inlen) {
+	blake2b_state S;
+	blake2b_state_internal* state = (blake2b_state_internal*)&S;
+	size_t bytes;
+
+	blake2b_init(&S);
+	state->h[0] ^= 0x40 ^ hashlen;
+
+	/* hash until <= 128 bytes left */
+	bytes = blake2b_consume_blocks(state, in, inlen);
+	in += bytes;
+	inlen -= bytes;
+
+	/* final block */
+	memset(&state->f[0], 0xff, 8);
+	blake2b_opt->blake2b_blocks(state, in, inlen, BLAKE2B_STRIDE_NONE);
+
+	if (hashlen > 64) hashlen = 64;
+	if (blake2b_endian_test.s == 0x0001) {
+		memcpy(hash, state->h, hashlen);
+	} else {
+		unsigned char hash64[64];
+		blake2b_store_hash(state, hash64);
+		memcpy(hash, hash64, hashlen);
+	}
+}
+
+LIB_PUBLIC void
 blake2b_keyed(unsigned char *hash, const unsigned char *in, size_t inlen, const unsigned char *key, size_t keylen) {
 	blake2b_state S;
 	blake2b_keyed_init(&S, key, keylen);

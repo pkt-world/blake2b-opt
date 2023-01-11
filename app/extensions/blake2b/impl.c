@@ -227,6 +227,7 @@ blake2b_init(blake2b_state *S) {
 LIB_PUBLIC void
 blake2b_keyed_init(blake2b_state *S, const unsigned char *key, size_t keylen) {
 	unsigned char k[BLAKE2B_BLOCKBYTES] = {0};
+	blake2b_state_internal *state = (blake2b_state_internal *)S;
 	if (keylen > BLAKE2B_KEYBYTES) {
 		fprintf(stderr, "key size larger than %u passed to blake2b_keyed_init", BLAKE2B_KEYBYTES);
 		exit(-1);
@@ -234,6 +235,7 @@ blake2b_keyed_init(blake2b_state *S, const unsigned char *key, size_t keylen) {
 		memcpy(k, key, keylen);
 	}
 	blake2b_init(S);
+	state->h[1] ^= keylen;
 	blake2b_update(S, k, BLAKE2B_BLOCKBYTES);
 }
 
